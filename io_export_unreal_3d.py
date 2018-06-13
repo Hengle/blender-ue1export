@@ -148,8 +148,8 @@ def print_ue1(data,aniv,dump):
 		print("WARNING: more than 65535 polygons (" + str(data.numpolys) + ")")
 	if data.numverts > 65535:
 		print("WARNING: more than 65535 vertices (" + str(data.numverts) + ")")
-	if htexnum > 7:
-		print("WARNING: material index above 7 detected (" + str(htexnum) + ")")
+	if htexnum > 8:
+		print("WARNING: material index above 8 detected (" + str(htexnum) + ")")
 	if aniv.numframes > 65535:
 		print("WARNING: more than 65535 frames (" + str(aniv.numframes) + ")")
 	if aniv.framesize > 65535:
