@@ -54,8 +54,8 @@ File that contains all the vertex positions for each frame of animation.
 
 * Number of Frames (uint16_t): total count of frames in the anivfile
 * Frame Size (uint16_t): size of one frame in bytes. Can be used to determine
-  vertex format (either standard, where framesize = numverts*4, or deus ex,
-  where framesize = numverts*8)
+  vertex format (either standard, where framesize = numverts × 4, or deus ex,
+  where framesize = numverts × 8)
 
 #### Animation Frame (variable size)
 
