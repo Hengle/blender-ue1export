@@ -35,16 +35,32 @@ File that contains triangle data.
     * 3: two-sided masked
     * 4: two-sided modulated
   * Flags:
-    * 0x08: weapon triangle (needs further investigation)
+    * 0x08: weapon triangle (see notes)
     * 0x10: unlit (draws fullbright)
-    * 0x20: curvy (???)
+    * 0x20: curvy (unknown original use, in Unreal v227 uses facet normal
+      rather than smoothed vertex normals, this is used for example in the
+      Wooden Box and Steel Box meshes)
     * 0x40: environment map (pseudo-cubemap shiny surface)
-    * 0x80: no smooth (triangle uses facet normal rather than smoothed vertex
-      normals)
+    * 0x80: no smooth (texture is not interpolated in this poly)
 * Poly Color (uint8_t): Unused
 * UV Coords (uint8_t[3][2]): Texture coords for each vertex in 0,255 range
 * Texture Number (uint8_t): Material index, UE1 supports 0-8 range
 * Flags (uint8_t): Unused, redundant
+
+Notes about "Weapon Triangle" flag:
+
+* Weapon's 3rd person mesh is attached to the midpoint of vertices 0 and 2 in
+  the poly.
+* Unit vector from 2 to 0 determines the Z axis for the weapon, Y comes from
+  the facet normal of the poly, and then X is calculated from the cross
+  product of the two.
+* Previously I theorized that the vertices were used for computing euler
+  angles. pitch and angle would come from a unit vector from 0 to 1, then the
+  vector from 2 to 0 would be used to calculate roll, but nope, that's not the
+  case.
+* Umodel strips the weapon triangle on mesh extraction. It is however preserved
+  by both UTPT and Unreal v227's updated editor. I may write a tool myself for
+  extracting meshes someday.
 
 ### ANIVFILE
 
