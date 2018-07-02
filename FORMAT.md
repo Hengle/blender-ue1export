@@ -37,15 +37,17 @@ File that contains triangle data.
   * Flags:
     * 0x08: weapon triangle (see notes)
     * 0x10: unlit (draws fullbright)
-    * 0x20: curvy (unknown original use, in Unreal v227 uses facet normal
-      rather than smoothed vertex normals, this is used for example in the
-      Wooden Box and Steel Box meshes)
+    * 0x20: curvy (originally would tessellate faces, no longer had any effect
+      since Unreal v216. In Unreal v227 the flag was repurposed to "flat face",
+      i.e. use facet normal rather than smoothed vertex normals, this is used
+      for example in the Wooden Box and Steel Box meshes)
     * 0x40: environment map (pseudo-cubemap shiny surface)
     * 0x80: no smooth (texture is not interpolated in this poly)
-* Poly Color (uint8_t): Unused
+* Poly Color (uint8_t): Unused (no idea if it ever got used)
 * UV Coords (uint8_t[3][2]): Texture coords for each vertex in 0,255 range
 * Texture Number (uint8_t): Material index, UE1 supports 0-8 range
-* Flags (uint8_t): Unused, redundant
+* Flags (uint8_t): Unused (kinda redundant when the type already has flags, but
+  who knows, maybe someone uses these for additional flags)
 
 Notes about "Weapon Triangle" flag:
 
@@ -59,8 +61,8 @@ Notes about "Weapon Triangle" flag:
   vector from 2 to 0 would be used to calculate roll, but nope, that's not the
   case.
 * Umodel strips the weapon triangle on mesh extraction. It is however preserved
-  by both UTPT and Unreal v227's updated editor. I may write a tool myself for
-  extracting meshes someday.
+  by both UTPT and Unreal v227's updated editor. My umodelextract tool also
+  preserves it.
 
 ### ANIVFILE
 
