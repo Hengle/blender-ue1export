@@ -5,7 +5,7 @@
 bl_info = {
 	"name": "Unreal .3D",
 	"author": "Marisa Kirisame",
-	"version": (1, 0, 0),
+	"version": (1, 0, 1),
 	"blender": (2, 7, 0),
 	"location": "File > Export > Unreal model (.3d)",
 	"description": "Export to Unreal Engine 1.x vertex mesh format (.3d)",
@@ -18,6 +18,8 @@ import bpy, struct, math, os, time
 
 default_deusex = False
 default_dump = False
+default_pscale = [1, 1, 1]
+default_poffset = [0, 0, 0]
 
 class ue1vert:
 	xyz = []
@@ -37,7 +39,7 @@ class ue1dxvert:
 		self.xyz = [0,0,0]
 
 	def Save(self, file):
-		data = struct.pack("<3H2x",self.xyz[0],self.xyz[1],self.xyz[2])
+		data = struct.pack("<3h2x",self.xyz[0],self.xyz[1],self.xyz[2])
 		file.write(data)
 
 class ue1frame:
@@ -100,10 +102,12 @@ class ue1datafile:
 			p.Save(file)
 
 class ue1settings:
-	def __init__(self,savepath,deusex,dump):
+	def __init__(self,savepath,deusex,dump,pscale,poffset):
 		self.savepath = savepath
 		self.deusex = deusex
 		self.dump = dump
+		self.pscale = pscale
+		self.poffset = poffset
 
 def print_ue1(data,aniv,dump):
 	if dump == True:
@@ -251,9 +255,9 @@ def save_ue1(settings):
 					else:
 						nvert = ue1vert()
 					nxyz = my_matrix*vert.co
-					nvert.xyz[0] = int(nxyz[0]*32768)
-					nvert.xyz[1] = -int(nxyz[1]*32768)
-					nvert.xyz[2] = int(nxyz[2]*32768)
+					nvert.xyz[0] = int((nxyz[0]*settings.pscale[0]+settings.poffset[0])*32768)
+					nvert.xyz[1] = -int((nxyz[1]*settings.pscale[1]+settings.poffset[1])*32768)
+					nvert.xyz[2] = int((nxyz[2]*settings.pscale[2]+settings.poffset[2])*32768)
 					nframe.verts.append(nvert)
 				aniv.frames.append(nframe)
 				bpy.data.meshes.remove(fobj)
@@ -287,9 +291,11 @@ class ExportUE1(bpy.types.Operator):
 	filepath = StringProperty(subtype='FILE_PATH',name="File Path",description="Filepath for exporting",maxlen=1024,default="")
 	ue1deusex = BoolProperty(name="Deus Ex format",description="Use Deus Ex high precision vertex format",default=default_deusex)
 	ue1dump = BoolProperty(name="Dump model to console",description="Dump full model information to console",default=default_dump)
+	pscale = FloatVectorProperty(name="Post scale",description="Scale factor applied to all vertices before export",default=default_pscale)
+	poffset = FloatVectorProperty(name="Post offset",description="Offset factor applied to all vertices before export",default=default_poffset)
 
 	def execute(self, context):
-		settings = ue1settings(savepath=self.properties.filepath,deusex=self.properties.ue1deusex,dump=self.properties.ue1dump)
+		settings = ue1settings(savepath=self.properties.filepath,deusex=self.properties.ue1deusex,dump=self.properties.ue1dump,pscale=self.properties.pscale,poffset=self.properties.poffset)
 		save_ue1(settings)
 		return {'FINISHED'}
 
