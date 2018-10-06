@@ -178,10 +178,15 @@ def save_ue1(settings):
 	aniv = ue1anivfile()
 	data = ue1datafile()
 	aniv.numframes = (bpy.context.scene.frame_end+1)-bpy.context.scene.frame_start
+	# reserve frames
+	for f in range(bpy.context.scene.frame_start,bpy.context.scene.frame_end+1):
+		nframe = ue1frame()
+		aniv.frames.append(nframe)
 	global actobject
 	actobject = bpy.context.scene.objects.active
 	selobjects = bpy.context.selected_objects
-	vlist = []
+	vmax = 0
+	tmax = 0
 	for obj in selobjects:
 		if obj.type == 'MESH':
 			bpy.context.scene.frame_set(bpy.context.scene.frame_start)
@@ -198,15 +203,13 @@ def save_ue1(settings):
 			tmpconv = []
 			UVImg = nobj.tessface_uv_textures[0]
 			coords = UVImg.data
-			j = 0
-			localvlist = []
+			vlist = []
 			for f,face in enumerate(nobj.tessfaces):
-				fcoords = coords[j]
-				j += 1
+				fcoords = coords[f]
 				poly = ue1poly()
 				# TODO poly types
 				poly.ptype = 0
-				poly.texnum = face.material_index
+				poly.texnum = face.material_index+tmax
 				for v,vert_index in enumerate(face.vertices):
 					poly.uv[2-v][0] = int(min(max(fcoords.uv[v][0]*255,0),255))
 					poly.uv[2-v][1] = int(min(max((1.0-fcoords.uv[v][1])*255,0),255))
@@ -218,13 +221,15 @@ def save_ue1(settings):
 							match_index = i
 					if match == 0:
 						vlist.append(vert_index)
-						localvlist.append(vert_index)
 						poly.vertices[2-v] = data.numverts
 						data.numverts += 1
 					else:
-						poly.vertices[2-v] = match_index
+						poly.vertices[2-v] = match_index+vmax
 				data.polys.append(poly)
 				data.numpolys += 1
+			vmax += len(nobj.vertices)
+			tmax += len(nobj.materials)
+			f = 0
 			for frame in range(bpy.context.scene.frame_start,bpy.context.scene.frame_end+1):
 				bpy.context.scene.frame_set(frame)
 				tmpconv = obj.data.copy()
@@ -238,17 +243,14 @@ def save_ue1(settings):
 				fobj = obj.to_mesh(bpy.context.scene, True, 'PREVIEW')
 				obj.data = tmpconv
 				tmpconv = []
-				nframe = ue1frame()
 				if obj.parent == "True":
 					if obj.parent.name == "Armature":
 						if obj.find_armature() != NULL:
 							skel_loc = obj.parent.location
-							nframe.localOrigin = obj.location-skel_loc
 							my_matrix = obj.matrix_world*obj.matrix_parent_inverse
 				else:
-					nframe.localOrigin = obj.location
 					my_matrix = obj.matrix_world
-				for vi in localvlist:
+				for vi in vlist:
 					vert = fobj.vertices[vi]
 					if settings.deusex == True:
 						nvert = ue1dxvert()
@@ -258,9 +260,9 @@ def save_ue1(settings):
 					nvert.xyz[0] = int((nxyz[0]*settings.pscale[0]+settings.poffset[0])*32768)
 					nvert.xyz[1] = -int((nxyz[1]*settings.pscale[1]+settings.poffset[1])*32768)
 					nvert.xyz[2] = int((nxyz[2]*settings.pscale[2]+settings.poffset[2])*32768)
-					nframe.verts.append(nvert)
-				aniv.frames.append(nframe)
+					aniv.frames[f].verts.append(nvert)
 				bpy.data.meshes.remove(fobj)
+				f += 1
 			bpy.data.meshes.remove(nobj)
 			obj = []
 	if settings.deusex == True:

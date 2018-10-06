@@ -16,13 +16,19 @@ now, thanks to me).
 * UE1 supports only up to 9 individual materials, GZDoom only up to 32.
 * (Remember to remove unused materials, as they still add up to the previous
   limit)
+* Only currently selected meshes will be exported.
 
 ## The big TODO list
 
 * Automatically offset/scale models before export to fit the limits.
 * Support for face types (currently you need to set those with UnrealFX)
-* Properly handle multiple objects with individual materials (currently the
-  exporter doesn't difference between material indices of separate objects).
+  - Shadeless material -> Unlit
+  - Global texture coordinates -> Environment Mapped
+  - Flat shaded face -> Curvy
+  - Some way to specify weapon triangle
+  - Some way to set render styles
+* Unify material indices pointing to the same material (currently per-object
+  materials are isolated).
 * Produce a "ready-to-use" .uc file with #exec directives containing all the
   needed offsets and scales on import, an "All" anim sequence containing all
   exported frames, and also texture imports and meshmap assignments for all
