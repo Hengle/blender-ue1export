@@ -51,15 +51,11 @@ File that contains triangle data.
 
 Notes about "Weapon Triangle" flag:
 
-* Weapon's 3rd person mesh is attached to the midpoint of vertices 0 and 2 in
+* Weapon's 3rd person mesh is attached to the midpoint of vertices 0 and 1 in
   the poly.
-* Unit vector from 2 to 0 determines the Z axis for the weapon, Y comes from
+* Unit vector from 0 to 1 determines the Z axis for the weapon, Y comes from
   the facet normal of the poly, and then X is calculated from the cross
   product of the two.
-* Previously I theorized that the vertices were used for computing euler
-  angles. pitch and angle would come from a unit vector from 0 to 1, then the
-  vector from 2 to 0 would be used to calculate roll, but nope, that's not the
-  case.
 * Umodel strips the weapon triangle on mesh extraction. It is however preserved
   by both UTPT and Unreal v227's updated editor. My umodelextract tool also
   preserves it.
@@ -74,6 +70,9 @@ File that contains all the vertex positions for each frame of animation.
 * Frame Size (uint16_t): size of one frame in bytes. Can be used to determine
   vertex format (either standard, where framesize = numverts × 4, or deus ex,
   where framesize = numverts × 8)
+* Some models from unreal prototypes have a frame size that's 8 bytes larger
+  than it should be, this is because they hold two additional vertices for the
+  minimum and maximum bounds of the frame.
 
 #### Animation Frame (variable size)
 
@@ -86,8 +85,7 @@ Vertex structure varies with format:
   signs for each). UE1 seems to process the numbers as-is, with X and Y being
   in the range -1024,1023 and Z being in the range -512,511. This is why so
   many model definitions in Unreal/UT tend to have a meshmap scale in Z that is
-  double as much as X or Y
+  double as much as X or Y.
 * Deus Ex format (int16_t[4]): 16 bits for X, Y and Z, plus padding. Only Deus
   Ex supports this, trying to use a mesh of this format in any other UE1 title
-  will have catastrophic effects. This format is currently not supported in
-  GZDoom
+  will have catastrophic effects.
