@@ -1,6 +1,6 @@
 # UE1 vertex mesh export plugin for Blender
 
-This is a plugin for Blender 2.7.9+ that exports an anivfile/datafile pair for
+This is a plugin for Blender 2.79 that exports an anivfile/datafile pair for
 use in Unreal Engine 1.x games (or in GZDoom, since it also supports the format
 now, thanks to me).
 
@@ -34,3 +34,4 @@ now, thanks to me).
   exported frames, and also texture imports and meshmap assignments for all
   materials.
 * Import plugin?
+* Support for 2.80? (very much not likely to happen)
